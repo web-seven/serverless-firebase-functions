@@ -5,7 +5,7 @@ This plugin enables support for HTTP NodeJS/TypeScript [Firebase Functions](http
 ## Highlights
 
 * Convert transparent simple HTTP function to Firebase compatible function
-* Deploy Firebase Function individually, no more foreign function sources deployed !!! Hello to Firebase Tools and Google Cloud Tools.
+* Deploy Firebase Function individually !!! Hello to Firebase Tools and Google Cloud Tools.
 * Configuration possibilities range from zero-config 
 * Deploy any HTTP handler based on Express request/response to Firebase Functions without any adaptation.
 * Support TypeScript functions
