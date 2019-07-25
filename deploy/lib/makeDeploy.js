@@ -1,9 +1,7 @@
 'use strict';
 
 const path = require('path');
-var client = require('firebase-tools');
-const firebaseDeploy = require('firebase-tools/lib/deploy');
-const firebaseConfig = require('firebase-tools/lib/config');
+const firebaseClient = require('firebase-tools');
 const firebaseApi = require('firebase-tools/lib/api');
 const firebaseAuth = require('firebase-tools/lib/auth');
 const BbPromise = require('bluebird');
@@ -29,48 +27,32 @@ module.exports = {
         );
         return BbPromise.all(promises);
     },
-    deploy() {
-        this.serverless.cli.log('Deploy Firebase functions...');
+    async deploy() {
+        var cli = this.serverless.cli;
+        cli.log('Deploy Firebase functions...');
         const firebasePath = path.join('.serverless', 'firebase', 'functions');
         const allFunctions = this.readyFunctionsForDeploy;
         firebaseApi.setAccessToken(this.token);
         logger.add(transports.Console);
         
-        client.list().then(function (data) {
-            console.log(data);
-        }).catch(function (err) {
-            // handle error
-        });
-        var promises = [];
         for (const functionName of allFunctions) {
-
-            this.serverless.cli.log('Deploy function: ' + functionName);
+            cli.log('Deploy function: ' + functionName);
             var functionPathRelative = path.join(firebasePath, functionName);
 
-            // await firebaseDeploy(['functions'], {
-            //     project: this.serverless.service.provider.project,
-            //     nonInteractive: true,
-            //     only: 'functions:' + functionName,
-            //     config: new firebaseConfig({ functions: { source: functionPathRelative } }, {
-            //         projectDir: path.resolve('.')
-            //     })
-            // })
-
-
-            promises.push(client.deploy({
+            await firebaseClient.deploy({
                 project: this.serverless.service.provider.project,
                 token: this.token,
                 force: true,
                 cwd: functionPathRelative,
-                projectDir: functionPathRelative,
+                projectDir: path.resolve(functionPathRelative),
                 only: 'functions:' + functionName,
             }).then(function () {
-                console.log('Rules have been deployed!')
+                cli.log('Function deployed.');
             }).catch(function (err) {
                 console.log(err)
-            }));
+            });
         }
 
-        return BbPromise.all(promises);
+        return BbPromise.resolve();
     },
 };
