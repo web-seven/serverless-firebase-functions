@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const AdmZip = require('adm-zip');
 const Handlebars = require('handlebars');
+const dependencies = require('../../package.json').dependencies
 const BbPromise = require('bluebird');
 
 module.exports = {
@@ -34,15 +35,12 @@ module.exports = {
             .forEach(functionName => {
                 this.serverless.cli.log('Extracting function: ' + functionName);
                 var functionObject = this.serverless.service.getFunction(functionName);
-
                 var artifactPath = path.resolve(functionObject.package.artifact);
                 var functionPath = path.resolve(path.join(artifactsPath, functionName));
                 var zip = new AdmZip(artifactPath);
                 zip.extractAllTo(functionPath, true);
                 this.serverless.cli.log('Function "' + functionName + '" artifact extracted to Firebase structure.');
 
-                const functionTemplate = fs.readFileSync(__dirname + '/templates/index.tpl', 'utf8');
-                const template = Handlebars.compile(functionTemplate);
                 const handlerParts = functionObject.handler.split('.');
                 const handlerPath = handlerParts.shift();
                 var handlerFunction = 'default';
@@ -50,22 +48,50 @@ module.exports = {
                     handlerFunction = handlerParts.join('.');
                 }
 
-                const contents = template({
+                var templateVariables = {
                     handlerPath: handlerPath,
                     functionName: functionName,
                     handlerFunction: handlerFunction,
                     region: this.serverless.service.provider.region
-                });
+                }
+
+                var functionTemplateType = 'index';
+                functionObject.events.forEach((event) => {
+                    Object.keys(event).forEach((key) => {
+                        switch (key) {
+                            case 'http':
+                                functionTemplateType = 'http';
+                                break;
+                            case 'pubsub':
+                                functionTemplateType = 'pubsub';
+                                templateVariables['topic'] = event.topic
+                                break;
+                        }
+                    })
+                })
+
+                const functionTemplate = fs.readFileSync(__dirname + '/templates/' + functionTemplateType + '.hbs', 'utf8');
+                const contents = Handlebars.compile(functionTemplate)(templateVariables);
 
                 fs.writeFileSync(path.join(functionPath, 'index.js'), contents);
 
-                var functionPackageJson = require(path.join(functionPath, 'package.json'));
+                const functionPackageJsonPath = path.join(functionPath, 'package.json');
+                const functionFirebaseJsonPath = path.join(functionPath, 'firebase.json');
+                var functionPackageJson = { dependencies: {} };
+                if (fs.existsSync(functionPackageJsonPath)) {
+                    functionPackageJson = require(functionPackageJsonPath)
+                }
                 functionPackageJson.engines = {
                     node: "8"
                 };
-                functionPackageJson.dependencies['firebase-functions'] = '3.1.0';
-                functionPackageJson.dependencies['firebase-admin'] = '8.2.0';
-                fs.writeFileSync(path.join(functionPath, 'package.json'), JSON.stringify(functionPackageJson));
+                functionPackageJson.dependencies['firebase-functions'] = dependencies['firebase-functions'];
+                functionPackageJson.dependencies['firebase-admin'] = dependencies['firebase-admin'];
+                fs.writeFileSync(functionPackageJsonPath, JSON.stringify(functionPackageJson));
+                fs.writeFileSync(functionFirebaseJsonPath, JSON.stringify({
+                    "functions": {
+                        "source": ''
+                    }
+                }));
                 readyFunctionsForDeploy.push(functionName);
             });
 
