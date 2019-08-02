@@ -1,12 +1,11 @@
 # Serverless Firebase Functions Plugin
 
-This plugin enables support for HTTP NodeJS/TypeScript [Firebase Functions](https://firebase.google.com/products/functions/) within the [Serverless Framework](https://github.com/serverless/serverless).
+This plugin enables support for HTTP/PubSub NodeJS/TypeScript [Firebase Functions](https://firebase.google.com/products/functions/) within the [Serverless Framework](https://github.com/serverless/serverless).
 
 ## Highlights
 
-* Convert transparent simple HTTP function to Firebase compatible function
-* Deploy Firebase Function individually !!! Hello to Firebase Tools and Google Cloud Tools.
-* Configuration possibilities range from zero-config 
+* Convert transparent HTTP and PubSub functions to Firebase compatible function
+* Deploy Firebase Function sources individually, no more another function sources deployed !!!
 * Deploy any HTTP handler based on Express request/response to Firebase Functions without any adaptation.
 * Support TypeScript functions
 * Based on [serverless-webpack](https://www.npmjs.com/package/serverless-webpack) plugin for package sources
@@ -37,26 +36,22 @@ provider:
   region: myFirebaseDeployRegion #eg. "us-central1". See there: https://firebase.google.com/docs/functions/locations
   project: myFireabaseProjectName #See there: https://firebase.google.com/docs/projects/learn-more
   accessToken: myFirebaseAccessToken #See how to generate it there: https://www.npmjs.com/package/firebase-tools#using-with-ci-systems
-```
 
-## Deployment
-
-### Configure function
-
-Thi plugin compatible with standard AWS Serverless functions configuration:
-
-```yaml
-# serverless.yml
 functions:
-  myFunction:
+  myHttpFunction:
     handler: handlers/myHandlerFile.myFunctionName
     events:
       - http: 
           path: myHttpUrlPath
           method: GET|PUT|POST|DELETE
+  myPubSubFunction:
+    handler: handlers/myHandlerFile.myFunctionName
+    events:
+      - pubsub: 
+          topic: myPubSubMessageTopic
 ```
 
-### Deploy
+## Deployment
 
 ```bash
 $ serverless deploy
@@ -65,5 +60,7 @@ $ serverless deploy
 ## To Do
 - [x] Use webpack to deploy function with packed dependencies.
 - [x] Deploy functions clean, without other handler sources.
-- [] Optimize deployment, make it parallel for every function.
-- [] Make possible to deploy external packages functions from "node_modules", just by mention them in config.
+- [x] Add PubSub functions support.
+- [x] Base on pure Firebase Tools API.
+- [ ] Optimize deployment, make it parallel for every function.
+- [ ] Make possible to deploy external packages functions from "node_modules", just by mention them in config.
