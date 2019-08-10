@@ -11,6 +11,10 @@ var logger = require("firebase-tools/lib/logger");
 module.exports = {
     token: '',
     makeDeploy() {
+        if(typeof this.options['dry-run'] !== undefined && this.options['dry-run']) {
+            return BbPromise.resolve();
+        }
+
         return BbPromise.bind(this)
             .then(this.auth)
             .then(this.deploy);

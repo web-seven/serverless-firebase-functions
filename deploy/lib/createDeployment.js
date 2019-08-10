@@ -64,7 +64,7 @@ module.exports = {
                                 break;
                             case 'pubsub':
                                 functionTemplateType = 'pubsub';
-                                templateVariables['topic'] = event.topic
+                                templateVariables['topic'] = event.pubsub.topic
                                 break;
                         }
                     })
