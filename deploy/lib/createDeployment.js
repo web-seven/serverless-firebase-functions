@@ -81,9 +81,19 @@ module.exports = {
                 if (fs.existsSync(functionPackageJsonPath)) {
                     functionPackageJson = require(functionPackageJsonPath)
                 }
-                functionPackageJson.engines = {
-                    node: "8"
-                };
+
+                if (this.serverless.service.provider.runtime) {
+                    switch (this.serverless.service.provider.runtime) {
+                        case 'nodejs8':
+                            functionPackageJson.engines = {
+                                node: '8'
+                            };
+                        case 'nodejs10':
+                            functionPackageJson.engines = {
+                                node: '10'
+                            };
+                    }
+                }
                 functionPackageJson.dependencies['firebase-functions'] = dependencies['firebase-functions'];
                 functionPackageJson.dependencies['firebase-admin'] = dependencies['firebase-admin'];
                 fs.writeFileSync(functionPackageJsonPath, JSON.stringify(functionPackageJson));

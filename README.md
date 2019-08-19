@@ -23,19 +23,61 @@ Add the plugin to your `serverless.yml` file:
 ```yaml
 plugins:
   - serverless-firebase-functions
+  - serverless-webpack
 ```
 
 ## Configure
-Requried to configure Firebase Serverless provider and standard configuration for Firebase Functions deploy.
+Firstly require to configure [serverless-webpack](https://www.npmjs.com/package/serverless-webpack) plugin.
+
+```js
+// webpack.config.js
+const path = require('path');
+const slsw = require('serverless-webpack');
+
+module.exports = {
+  entry: slsw.lib.entries,
+  resolve: {
+    extensions: [
+      '.js',
+      '.json',
+      '.ts',
+      '.tsx'
+    ]
+  },
+  output: {
+    libraryTarget: 'commonjs',
+    path: path.join(__dirname, '.webpack'),
+    filename: '[name].js'
+  },
+  target: 'node',
+  module: {
+    rules: [
+      {
+        test: /\.ts(x?)$/,
+        use: [
+          {
+            loader: 'ts-loader'
+          }
+        ],
+      }
+    ]
+  }
+};
+```
+
+Next requried to configure Firebase Serverless provider and standard configuration for Firebase Functions deploy.
 
 ```yaml
 provider:
   name: firebase
   stage: dev
-  runtime: nodejs8
+  runtime: nodejs8 # nodejs8 or nodejs10
   region: myFirebaseDeployRegion #eg. "us-central1". See there: https://firebase.google.com/docs/functions/locations
   project: myFireabaseProjectName #See there: https://firebase.google.com/docs/projects/learn-more
   accessToken: myFirebaseAccessToken #See how to generate it there: https://www.npmjs.com/package/firebase-tools#using-with-ci-systems
+
+package:
+  individually: true
 
 functions:
   myHttpFunction:
