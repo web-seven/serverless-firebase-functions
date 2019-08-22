@@ -1,4 +1,10 @@
 const functions = require('firebase-functions');
 const handler = require('./{{handlerPath}}');
+const merge = require('lodash.merge');
+const config = functions.config();
+const fucntionName = '{{functionName}}';
+if(typeof config['serverless'][fucntionName.toLowerCase()] === 'string') {
+    process.env = merge(JSON.parse(new Buffer(config['serverless'][fucntionName.toLowerCase()],'base64').toString()), process.env);
+}
 
-exports.{{functionName}} = functions.region('{{region}}').https.onRequest(handler.{{handlerFunction}});
+exports[fucntionName] = functions.region('{{region}}').https.onRequest(handler.{{handlerFunction}});

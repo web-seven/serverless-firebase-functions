@@ -1,6 +1,6 @@
 {
     "name": "serverless-firebase-functions",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "Provider plugin for the Serverless Framework v1.x which adds support for Firebase Cloud Functions.",
     "main": "index.js",
     "author": "Head Squad <headsquadbox@gmail.com>",
@@ -16,14 +16,15 @@
     ],
     "dependencies": {
         "bluebird": "^3.4.7",
+        "lodash.merge": "^4.6.2",
         "adm-zip": "^0.4.13",
         "handlebars": "^4.1.2",
-        "firebase-tools": "7.0.0",
+        "firebase-tools": "^7.0.0",
         "firebase-functions": "^3.2.0",
         "firebase-admin": "^8.2.0",
         "serverless-webpack": "^5.3.0",
         "winston": "^1.0.1",
-        "rimraf": "2.6.3"
+        "rimraf": "^2.6.3"
     },
     "peerDependencies": {
         "serverless": ">= 1.0.0 < 2.0.0"

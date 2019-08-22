@@ -96,6 +96,7 @@ module.exports = {
                 }
                 functionPackageJson.dependencies['firebase-functions'] = dependencies['firebase-functions'];
                 functionPackageJson.dependencies['firebase-admin'] = dependencies['firebase-admin'];
+                functionPackageJson.dependencies['lodash.merge'] = dependencies['lodash.merge'];
                 fs.writeFileSync(functionPackageJsonPath, JSON.stringify(functionPackageJson));
                 fs.writeFileSync(functionFirebaseJsonPath, JSON.stringify({
                     "functions": {

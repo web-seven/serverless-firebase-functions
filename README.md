@@ -8,6 +8,7 @@ This plugin enables support for HTTP/PubSub NodeJS/TypeScript [Firebase Function
 * Deploy Firebase Function sources individually, no more another function sources deployed !!!
 * Deploy any HTTP handler based on Express request/response to Firebase Functions without any adaptation.
 * Support TypeScript functions
+* Environment variables automatically managed by Cloud Runtime Configuration API
 * Based on [serverless-webpack](https://www.npmjs.com/package/serverless-webpack) plugin for package sources
 * Based on official [Firebase Tools](https://www.npmjs.com/package/firebase-tools) and [Firebase Admin](https://www.npmjs.com/package/firebase-admin)
 * Support NPM and Yarn for packaging
@@ -74,7 +75,9 @@ provider:
   runtime: nodejs8 # nodejs8 or nodejs10
   region: myFirebaseDeployRegion #eg. "us-central1". See there: https://firebase.google.com/docs/functions/locations
   project: myFireabaseProjectName #See there: https://firebase.google.com/docs/projects/learn-more
-  accessToken: myFirebaseAccessToken #See how to generate it there: https://www.npmjs.com/package/firebase-tools#using-with-ci-systems
+  token: myFirebaseAccessToken #See how to generate it there: https://www.npmjs.com/package/firebase-tools#using-with-ci-systems
+  environment:
+    serviceEnvVar: someValue
 
 package:
   individually: true
@@ -82,12 +85,16 @@ package:
 functions:
   myHttpFunction:
     handler: handlers/myHandlerFile.myFunctionName
+    environment:
+        serviceEnvVar: overServiceValue
     events:
       - http: 
           path: myHttpUrlPath
           method: GET|PUT|POST|DELETE
   myPubSubFunction:
     handler: handlers/myHandlerFile.myFunctionName
+    environment:
+        functionEnvVar: someValue
     events:
       - pubsub: 
           topic: myPubSubMessageTopic
@@ -104,5 +111,6 @@ $ serverless deploy
 - [x] Deploy functions clean, without other handler sources.
 - [x] Add PubSub functions support.
 - [x] Base on pure Firebase Tools API.
+- [x] Add inherited environment variables support.
 - [ ] Optimize deployment, make it parallel for every function.
 - [ ] Make possible to deploy external packages functions from "node_modules", just by mention them in config.
