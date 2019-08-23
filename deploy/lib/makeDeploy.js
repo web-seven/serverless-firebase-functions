@@ -68,7 +68,10 @@ module.exports = {
         }
 
         if(functionsConfig.length > 0) {
-            await firebaseClient.functions.config.set(functionsConfig, {});
+            await firebaseClient.functions.config.set(functionsConfig, {
+                project: this.serverless.service.provider.project,
+                token: this.token
+            });
         }
 
         for (const functionName of allFunctions) {
