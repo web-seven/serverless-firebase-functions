@@ -7,4 +7,8 @@ if(typeof config['serverless'][fucntionName.toLowerCase()] === 'string') {
     process.env = merge(JSON.parse(new Buffer(config['serverless'][fucntionName.toLowerCase()],'base64').toString()), process.env);
 }
 
-exports.{{functionName}} = functions.region('{{region}}').pubsub.topic('{{topic}}').onPublish(handler.{{handlerFunction}});
+exports.{{functionName}} = functions.region('{{region}}').pubsub.topic('{{topic}}').onPublish(message => {
+    if (message) {
+        return handler.{{handlerFunction}}(message);
+    }
+});
